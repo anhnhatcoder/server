@@ -1,0 +1,496 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+    />
+    <title>AI VISION GUARD | AnhNhat IoT</title>
+
+    <!-- Thư viện Icon & Font -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #00d4ff;
+        --secondary: #e94560;
+        --success: #00ff9d;
+        --bg: #050505;
+        --card-bg: #111111;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #ffffff;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      header {
+        padding: 15px 4%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        background: rgba(10, 10, 10, 0.8);
+        backdrop-filter: blur(12px);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .btn-nav {
+        text-decoration: none;
+        color: #888;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        transition: var(--transition);
+        text-transform: uppercase;
+      }
+      .btn-nav:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        border-color: #444;
+      }
+      .btn-primary:hover {
+        background: var(--primary);
+        color: #000;
+        border-color: var(--primary);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+      }
+
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: 10px;
+      }
+      .logo-group img {
+        width: 32px;
+        filter: drop-shadow(0 0 5px var(--primary));
+      }
+      .logo-group h2 {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: var(--text);
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .ws-badge {
+        font-size: 10px;
+        font-weight: 800;
+        padding: 6px 15px;
+        border-radius: 50px;
+        border: 1px solid #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        color: #555;
+      }
+      .ws-badge.online {
+        color: var(--success);
+        border-color: var(--success);
+        box-shadow: 0 0 10px rgba(0, 255, 157, 0.1);
+      }
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        background: currentColor;
+        border-radius: 50%;
+      }
+
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 25px;
+        padding: 25px 4%;
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      @media (max-width: 1100px) {
+        .main-content {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .viewport-container {
+        background: var(--card-bg);
+        border-radius: 28px;
+        padding: 20px;
+        border: 1px solid var(--border);
+        position: relative;
+      }
+      .screen-wrapper {
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: #000;
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        border: 2px solid #1a1a1a;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      #live-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        image-rendering: pixelated;
+      }
+
+      .fps-tag {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 13px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        z-index: 10;
+      }
+
+      .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: var(--primary);
+        top: 0;
+        box-shadow: 0 0 15px var(--primary);
+        animation: scan 4s linear infinite;
+        pointer-events: none;
+        z-index: 5;
+        will-change: transform;
+      }
+      @keyframes scan {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(75vh);
+        }
+      }
+
+      .side-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+      .card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 25px;
+        border: 1px solid var(--border);
+      }
+      .card-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #444;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .ai-status-box {
+        text-align: center;
+      }
+      .ai-name {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--success);
+        margin-bottom: 5px;
+        text-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+      }
+      .ai-conf {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 14px;
+        color: #555;
+      }
+
+      .log-area {
+        height: 380px;
+        overflow-y: auto;
+        padding-right: 8px;
+      }
+      .log-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        font-size: 13px;
+        animation: slideUp 0.3s ease;
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .log-time {
+        color: #444;
+        font-family: "JetBrains Mono";
+      }
+      .log-msg {
+        color: #ccc;
+        font-weight: 600;
+        flex: 1;
+        margin: 0 15px;
+      }
+      .log-tag {
+        font-size: 9px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #222;
+        border-radius: 10px;
+      }
+      footer {
+        margin-top: auto;
+        padding: 30px;
+        text-align: center;
+        font-size: 11px;
+        color: #333;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="nav-left">
+        <a href="/" class="btn-nav btn-primary"
+          ><i class="fas fa-home"></i> Portal</a
+        >
+        <div class="logo-group">
+          <img src="https://gtsolution.vn/wp-content/uploads/bachkhoa.png" />
+          <h2>AI GUARD</h2>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div id="ws-badge" class="ws-badge">
+          <span class="status-dot"></span
+          ><span id="ws-status-text">Đang kết nối...</span>
+        </div>
+        <form
+          action="{% url 'ai_logout' %}"
+          method="post"
+          style="display: inline"
+        >
+          {% csrf_token %}
+          <button type="submit" class="btn-logout">
+            <i class="fas fa-power-off"></i> Đăng xuất
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="viewport-container">
+        <div class="card-label">
+          <i class="fas fa-bolt"></i> Turbo Stream Mode (v2.1)
+        </div>
+        <div class="screen-wrapper">
+          <div class="fps-tag" id="fps-counter">0 FPS</div>
+          <canvas id="live-canvas"></canvas>
+          <div class="scan-line"></div>
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="card">
+          <div class="card-label">
+            <i class="fas fa-user-shield"></i> Trạng thái nhận diện
+          </div>
+          <div class="ai-status-box">
+            <div class="ai-name" id="ai-name">CHỜ DỮ LIỆU...</div>
+            <div id="ai-conf" class="ai-conf">ĐỘ TIN CẬY: 0.0%</div>
+          </div>
+        </div>
+        <div class="card" style="flex: 1">
+          <div class="card-label">
+            <i class="fas fa-list-ul"></i> Nhật ký hoạt động
+          </div>
+          <div class="log-area" id="activity-log"></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      &copy; 2025 AnhNhat IoT Cloud | Ultra High-Performance Vision
+    </footer>
+
+    <script>
+      const canvas = document.getElementById("live-canvas");
+      const ctx = canvas.getContext("2d", {
+        alpha: false,
+        desynchronized: true,
+      });
+
+      const wsBadge = document.getElementById("ws-badge");
+      const wsStatusText = document.getElementById("ws-status-text");
+      const fpsDisplay = document.getElementById("fps-counter");
+      const aiName = document.getElementById("ai-name");
+      const aiConf = document.getElementById("ai-conf");
+      const logContainer = document.getElementById("activity-log");
+
+      let socket = null;
+      let frameCount = 0;
+      let startTime = performance.now();
+
+      // Bộ đệm khung hình (Frame Buffer)
+      let nextFrame = null;
+      let isDrawing = false;
+
+      canvas.width = 320;
+      canvas.height = 240;
+      ctx.imageSmoothingEnabled = false;
+
+      // Hàm vẽ đồng bộ với tần số quét màn hình (V-Sync)
+      function renderLoop() {
+        if (nextFrame) {
+          ctx.drawImage(nextFrame, 0, 0);
+          nextFrame.close(); // Giải phóng RAM ngay sau khi vẽ
+          nextFrame = null;
+          frameCount++;
+        }
+
+        const now = performance.now();
+        if (now - startTime >= 1000) {
+          fpsDisplay.innerText = `${frameCount} FPS`;
+          frameCount = 0;
+          startTime = now;
+        }
+
+        requestAnimationFrame(renderLoop);
+      }
+
+      function initWebSocket() {
+        const proto = location.protocol === "https:" ? "wss" : "ws";
+        socket = new WebSocket(`${proto}://${location.host}/ws/esp-ai/stream/`);
+        socket.binaryType = "arraybuffer";
+
+        socket.onopen = () => {
+          wsBadge.classList.add("online");
+          wsStatusText.innerText = "Trực tuyến";
+          createLog("Hệ thống", "Đã kết nối luồng Turbo v2.1", "SUCCESS");
+          requestAnimationFrame(renderLoop); // Bắt đầu vòng lặp vẽ
+        };
+
+        socket.onmessage = async (event) => {
+          if (event.data instanceof ArrayBuffer) {
+            try {
+              // Giải mã ảnh ở luồng ngầm (Worker Thread ngầm của trình duyệt)
+              const blob = new Blob([event.data], { type: "image/jpeg" });
+              const bitmap = await createImageBitmap(blob);
+
+              // Nếu có khung hình cũ chưa kịp vẽ, đóng nó để tiết kiệm RAM
+              if (nextFrame) nextFrame.close();
+
+              // Gán khung hình mới vào hàng đợi vẽ
+              nextFrame = bitmap;
+
+              // Tự động điều chỉnh kích thước nếu ESP thay đổi Resolution
+              if (
+                canvas.width !== bitmap.width ||
+                canvas.height !== bitmap.height
+              ) {
+                canvas.width = bitmap.width;
+                canvas.height = bitmap.height;
+                ctx.imageSmoothingEnabled = false;
+              }
+            } catch (e) {
+              // Bỏ qua khung hình lỗi
+            }
+          } else {
+            try {
+              const info = JSON.parse(event.data);
+              if (info.name) {
+                aiName.innerText = info.name.toUpperCase();
+                aiConf.innerText = `ĐỘ TIN CẬY: ${info.confidence}%`;
+                if (info.name !== "Unknown")
+                  createLog("AI_VISION", `Phát hiện: ${info.name}`, "DETECT");
+              }
+            } catch (err) {}
+          }
+        };
+
+        socket.onclose = () => {
+          wsBadge.classList.remove("online");
+          wsStatusText.innerText = "Mất kết nối";
+          setTimeout(initWebSocket, 2000);
+        };
+      }
+
+      function createLog(tag, msg, type) {
+        const time = new Date().toLocaleTimeString("vi-VN");
+        const item = document.createElement("div");
+        item.className = "log-row";
+        item.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${msg}</span><span class="log-tag" style="color:${
+          type === "DETECT" ? "#00ff9d" : "#444"
+        }">${tag}</span>`;
+        logContainer.prepend(item);
+        if (logContainer.children.length > 15)
+          logContainer.removeChild(logContainer.lastChild);
+      }
+
+      initWebSocket();
+    </script>
+  </body>
+</html>

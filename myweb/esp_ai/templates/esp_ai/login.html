@@ -1,0 +1,350 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+    />
+    <title>SECURE ACCESS | AI Vision Guard</title>
+
+    <!-- Thư viện Icon & Font -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #00d4ff;
+        --secondary: #e94560;
+        --bg: #050505;
+        --card-bg: #0f0f0f;
+        --border: rgba(0, 212, 255, 0.2);
+        --text: #ffffff;
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg);
+        background-image: radial-gradient(
+          circle at 50% 50%,
+          #111 0%,
+          #050505 100%
+        );
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        color: var(--text);
+      }
+
+      /* Hiệu ứng lưới công nghệ chạy dưới nền */
+      body::before {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background-image:
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 50px 50px;
+        background-position: center;
+        transform: perspective(500px) rotateX(60deg) translateY(-10%);
+        opacity: 0.15;
+        z-index: 0;
+        animation: gridMove 20s linear infinite;
+      }
+
+      @keyframes gridMove {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: 0 50px;
+        }
+      }
+
+      .login-container {
+        width: 100%;
+        max-width: 420px;
+        padding: 45px;
+        background: var(--card-bg);
+        border-radius: 35px;
+        border: 1px solid var(--border);
+        position: relative;
+        z-index: 10;
+        box-shadow: 0 0 60px rgba(0, 212, 255, 0.15);
+        backdrop-filter: blur(15px);
+        animation: fadeIn 0.8s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo-box {
+        text-align: center;
+        margin-bottom: 35px;
+      }
+      .logo-box img {
+        width: 65px;
+        filter: drop-shadow(0 0 12px var(--primary));
+      }
+      .logo-box h2 {
+        font-size: 22px;
+        font-weight: 800;
+        color: white;
+        letter-spacing: 3px;
+        margin-top: 20px;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        color: #666;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        letter-spacing: 1.5px;
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+      .input-wrapper i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #444;
+        font-size: 14px;
+      }
+
+      input {
+        width: 100%;
+        padding: 15px 15px 15px 48px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid #222;
+        border-radius: 14px;
+        color: white;
+        font-size: 15px;
+        outline: none;
+        transition: var(--transition);
+      }
+      input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      /* Tùy chỉnh ô tích hiện mật khẩu */
+      .show-pwd-area {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: -15px;
+        margin-bottom: 25px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .show-pwd-area input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary);
+        cursor: pointer;
+        padding: 0; /* Reset padding for checkbox */
+      }
+      .show-pwd-area span {
+        font-size: 11px;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 18px;
+        border-radius: 14px;
+        border: none;
+        background: var(--primary);
+        color: #000;
+        font-weight: 800;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 15px;
+        font-size: 14px;
+        letter-spacing: 1px;
+      }
+      .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(0, 212, 255, 0.4);
+        filter: brightness(1.1);
+      }
+
+      .error-msg {
+        background: rgba(233, 69, 96, 0.1);
+        color: var(--secondary);
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        border: 1px solid rgba(233, 69, 96, 0.3);
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .footer-links {
+        margin-top: 35px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .back-link {
+        text-decoration: none;
+        color: #555;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .back-link:hover {
+        color: var(--primary);
+      }
+
+      .system-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        color: #222;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo-box">
+        <img
+          src="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+          alt="BK"
+        />
+        <h2>AI Vision Guard</h2>
+      </div>
+
+      {% if form.errors %}
+      <div class="error-msg">
+        <i class="fas fa-shield-virus"></i> Xác thực danh tính thất bại
+      </div>
+      {% endif %}
+
+      <form method="post" action="{{ request.get_full_path }}">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label>Access Identity</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user-secret"></i>
+            <input
+              type="text"
+              name="username"
+              id="id_username"
+              placeholder="Tên đăng nhập"
+              required
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Security Key</label>
+          <div class="input-wrapper">
+            <i class="fas fa-fingerprint"></i>
+            <input
+              type="password"
+              name="password"
+              id="id_password"
+              placeholder="Mật khẩu bảo mật"
+              required
+            />
+          </div>
+        </div>
+
+        <label class="show-pwd-area">
+          <input type="checkbox" id="showPassCheck" />
+          <span>Hiển thị mật mã</span>
+        </label>
+
+        <button type="submit" class="btn-submit">
+          Xác thực truy cập
+          <i
+            class="fas fa-chevron-right"
+            style="margin-left: 8px; font-size: 12px"
+          ></i>
+        </button>
+      </form>
+
+      <div class="footer-links">
+        <a href="/" class="back-link">
+          <i class="fas fa-arrow-left"></i> Quay lại Portal
+        </a>
+        <div class="system-tag">ENCRYPTED_SESSION_V2.0</div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const userInput = document.getElementById("id_username");
+        const passInput = document.getElementById("id_password");
+        const showCheck = document.getElementById("showPassCheck");
+
+        // 1. Tự động điền tài khoản demo
+        if (userInput) userInput.value = "guest";
+        if (passInput) passInput.value = "pass12345";
+
+        // 2. Logic hiện/ẩn mật khẩu
+        if (showCheck && passInput) {
+          showCheck.addEventListener("change", function () {
+            passInput.type = this.checked ? "text" : "password";
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

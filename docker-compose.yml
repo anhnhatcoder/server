@@ -1,0 +1,55 @@
+services:
+  # 1. WEB DJANGO
+  web:
+    build: .
+    # SỬA TẠI ĐÂY: Đưa về gốc /app để thấy manage.py
+    working_dir: /app
+    command: daphne -v 0 --access-log /dev/null -b 0.0.0.0 -p 8000 myweb.asgi:application
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - redis
+    restart: always
+
+  # 2. REDIS
+  redis:
+    image: redis:alpine
+    command: redis-server --save "" --appendonly no
+    restart: always
+
+  # 3. MQTT WORKER
+  mqtt-worker:
+    build: .
+    working_dir: /app
+    # SỬA TẠI ĐÂY: Chạy trực tiếp vì mqtt_aws.py nằm ở /app
+    command: python3 mqtt_aws.py
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - redis
+    restart: always
+
+  # 4. CADDY
+  caddy:
+    image: caddy:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:

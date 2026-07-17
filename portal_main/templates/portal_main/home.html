@@ -1,0 +1,912 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+    />
+    <title>ANHNHAT IOT | Smart Ecosystem</title>
+
+    <!-- Thư viện Icon và Font -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --sidebar-width: 260px;
+        --sidebar-collapsed-width: 70px;
+        --primary: #00d4ff;
+        --accent: #ff9f1c;
+        --bg: #050505;
+        --card-bg: #121212;
+        --text: #ffffff;
+        --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      body {
+        display: flex;
+        height: 100vh;
+        background-color: var(--bg);
+        color: var(--text);
+        overflow: hidden;
+      }
+
+      /* --- 1. Sidebar --- */
+      .sidebar {
+        width: var(--sidebar-width);
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        transition: var(--transition);
+        z-index: 2000;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+      .sidebar.collapsed {
+        width: var(--sidebar-collapsed-width);
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          left: -280px;
+          top: 0;
+          height: 100%;
+          width: 280px;
+          box-shadow: 10px 0 50px rgba(0, 0, 0, 0.8);
+        }
+        .sidebar.mobile-open {
+          left: 0;
+        }
+      }
+
+      .sidebar-header {
+        padding: 30px 15px;
+        display: flex;
+        align-items: center;
+        height: 80px;
+      }
+      .logo-toggle {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: 0.3s;
+        object-fit: contain;
+        filter: drop-shadow(0 0 5px var(--primary));
+      }
+
+      .mobile-trigger {
+        display: none;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1500;
+        cursor: pointer;
+        padding: 3px;
+        background: rgba(0, 212, 255, 0.1);
+        border-radius: 50%;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        backdrop-filter: blur(1px);
+        animation: pulseLogo 2s infinite;
+      }
+      @keyframes pulseLogo {
+        0% {
+          box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(0, 212, 255, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
+        }
+      }
+      @media (max-width: 768px) {
+        .mobile-trigger {
+          display: block;
+        }
+      }
+
+      .brand-name {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--primary);
+        margin-left: 15px;
+        transition: opacity 0.3s;
+      }
+      .sidebar.collapsed .brand-name {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .menu {
+        padding: 0 10px;
+        flex-grow: 1;
+        margin-top: 20px;
+      }
+      .menu a {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        color: #888;
+        text-decoration: none;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        transition: 0.3s;
+        cursor: pointer;
+      }
+      .menu a:hover,
+      .menu a.active {
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--primary);
+      }
+      .menu i {
+        font-size: 20px;
+        text-align: center;
+      }
+      .menu-text {
+        margin-left: 15px;
+        font-weight: 600;
+      }
+      .sidebar.collapsed .menu-text {
+        display: none;
+      }
+
+      /* --- 2. Main Scroll Area --- */
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        position: relative;
+        scroll-behavior: smooth;
+      }
+      .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 1900;
+      }
+      .overlay.active {
+        display: block;
+      }
+
+      /* --- 3. Hero Section --- */
+      .hero {
+        height: 50vh;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        z-index: 1;
+        transition: background-image 1.2s ease-in-out;
+        flex-shrink: 0;
+      }
+      @media (max-width: 768px) {
+        .hero {
+          height: 50dvh !important;
+        }
+      }
+
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle,
+          rgba(0, 0, 0, 0.1) 0%,
+          rgba(0, 0, 0, 0.85) 100%
+        );
+      }
+      .hero-text {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        padding: 0 20px;
+      }
+      .hero-text h1 {
+        font-size: clamp(3rem, 10vw, 7rem);
+        font-weight: 900;
+        letter-spacing: -3px;
+        text-transform: uppercase;
+        background: linear-gradient(to bottom, #fff 30%, var(--primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 0.9;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+      }
+      .hero-text p {
+        font-size: 1.2rem;
+        color: #ccc;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        margin-top: 15px;
+        opacity: 0.9;
+      }
+
+      /* --- 4. Content Body --- */
+      .content-body {
+        position: relative;
+        z-index: 10;
+        background: var(--bg);
+        padding-top: 10px;
+        border-top-left-radius: 60px;
+        border-top-right-radius: 60px;
+        box-shadow: 0 -50px 100px rgba(0, 0, 0, 1);
+      }
+      @media (max-width: 768px) {
+        .content-body {
+          border-top-left-radius: 40px;
+          border-top-right-radius: 40px;
+        }
+      }
+
+      .container {
+        padding: 40px 4%;
+        max-width: 1650px;
+        margin: 0 auto;
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 50px;
+      }
+      .section-title {
+        color: var(--primary);
+        font-size: 32px;
+        font-weight: 800;
+        border-left: 8px solid var(--primary);
+        padding-left: 25px;
+        text-transform: uppercase;
+      }
+
+      /* --- 5. Project Slider --- */
+      .swiper {
+        width: 100%;
+        padding-bottom: 80px !important;
+      }
+      .swiper-slide {
+        height: 520px;
+        background: var(--card-bg);
+        border-radius: 32px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        position: relative;
+      }
+      .swiper-slide:hover {
+        transform: translateY(-20px) scale(1.02);
+        border-color: var(--primary);
+        box-shadow: 0 30px 60px rgba(0, 212, 255, 0.2);
+      }
+
+      .project-img-box {
+        height: 60%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+      .project-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.8s;
+      }
+      .swiper-slide:hover .project-img {
+        transform: scale(1.15);
+      }
+
+      .status-tag {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: var(--primary);
+        color: #000;
+        z-index: 5;
+      }
+
+      .project-info {
+        padding: 25px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 40%;
+      }
+      .project-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 10px;
+      }
+      .project-desc {
+        font-size: 15px;
+        color: #888;
+        line-height: 1.6;
+      }
+      .btn-enter {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary);
+        text-transform: uppercase;
+        text-decoration: none;
+        margin-top: 15px;
+      }
+
+      /* --- 6. Project Details --- */
+      .project-details {
+        margin-top: 100px;
+        padding-bottom: 80px;
+      }
+      .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 80px;
+        margin-bottom: 150px;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s ease-out;
+      }
+      .detail-row.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .detail-row.reverse {
+        flex-direction: row-reverse;
+      }
+
+      @media (max-width: 1024px) {
+        .detail-row,
+        .detail-row.reverse {
+          flex-direction: column;
+          text-align: center;
+          gap: 40px;
+        }
+      }
+
+      .detail-content {
+        flex: 1;
+      }
+      .detail-tag {
+        display: inline-block;
+        color: var(--accent);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        font-size: 14px;
+      }
+      .detail-title {
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 25px;
+        line-height: 1.1;
+      }
+      .detail-paragraph {
+        font-size: 18px;
+        color: #aaa;
+        line-height: 1.8;
+        margin-bottom: 35px;
+        text-align: justify;
+      }
+      @media (max-width: 1024px) {
+        .detail-paragraph {
+          text-align: center;
+        }
+      }
+
+      .tech-stack {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+      @media (max-width: 1024px) {
+        .tech-stack {
+          justify-content: center;
+        }
+      }
+      .tech-badge {
+        background: rgba(0, 212, 255, 0.05);
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 13px;
+        color: var(--primary);
+        font-weight: 700;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+      }
+
+      .detail-image {
+        flex: 1;
+        position: relative;
+        width: 100%;
+      }
+      .detail-img-frame {
+        width: 100%;
+        height: 480px;
+        border-radius: 35px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+      }
+      .detail-img-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .glow-bg {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: var(--primary);
+        filter: blur(150px);
+        opacity: 0.15;
+        z-index: 0;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      /* --- 7. Footer --- */
+      .portal-footer {
+        padding: 80px 20px;
+        background: #080808;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        text-align: center;
+      }
+      .footer-socials {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-bottom: 30px;
+      }
+      .social-link {
+        color: #555;
+        font-size: 32px;
+        text-decoration: none;
+        transition: 0.4s;
+      }
+      .social-link:hover {
+        color: var(--primary);
+        transform: translateY(-8px);
+        filter: drop-shadow(0 0 10px var(--primary));
+      }
+      .footer-copy {
+        font-size: 13px;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 800;
+      }
+
+      .swiper-nav-container {
+        display: flex;
+        gap: 20px;
+      }
+      @media (max-width: 768px) {
+        .swiper-nav-container {
+          display: none;
+        }
+      }
+      .custom-prev,
+      .custom-next {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .custom-prev:hover,
+      .custom-next:hover {
+        background: var(--primary);
+        color: #000;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mobile-trigger" id="mobileTrigger">
+      <img
+        src="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+        alt="Logo"
+        style="width: 45px; height: 45px"
+      />
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="sidebar collapsed" id="sidebar">
+      <div class="sidebar-header">
+        <img
+          src="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+          alt="Toggle"
+          class="logo-toggle"
+          id="sidebarToggle"
+        />
+        <div class="brand-name">AnhNhat Cloud</div>
+      </div>
+      <div class="menu">
+        <a href="/" class="active"
+          ><i class="fas fa-home"></i
+          ><span class="menu-text">Trang chủ</span></a
+        >
+        <a href="#"
+          ><i class="fas fa-newspaper"></i
+          ><span class="menu-text">Tin tức</span></a
+        >
+        <a id="contactSidebarLink"
+          ><i class="fas fa-envelope"></i
+          ><span class="menu-text">Liên hệ</span></a
+        >
+        <a href="/garden/"
+          ><i class="fas fa-leaf"></i
+          ><span class="menu-text">Vườn thông minh</span></a
+        >
+        <!-- Thêm link tắt cho CNC -->
+        <a href="{% url 'cnc_app' %}"
+          ><i class="fas fa-microchip"></i
+          ><span class="menu-text">CNC PCB</span></a
+        >
+      </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+      <div class="hero" id="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-text" id="heroText">
+          <p>Innovating with</p>
+          <h1>IoT Systems</h1>
+        </div>
+      </div>
+
+      <div class="content-body">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-title">Hệ thống dự án</div>
+            <div class="swiper-nav-container">
+              <div class="custom-prev" id="prevBtn">
+                <i class="fas fa-chevron-left"></i>
+              </div>
+              <div class="custom-next" id="nextBtn">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="swiper projectSwiper">
+            <div class="swiper-wrapper">
+              <!-- Project 1: Smart Garden -->
+              <div class="swiper-slide">
+                <a
+                  href="/garden/"
+                  style="text-decoration: none; color: inherit"
+                >
+                  <div class="project-img-box">
+                    <div class="status-tag">Active</div>
+                    <img
+                      src="{% static 'anh1.jpg' %}"
+                      class="project-img"
+                      alt="Garden"
+                    />
+                  </div>
+                  <div class="project-info">
+                    <h3 class="project-title">Smart Garden v1</h3>
+                    <p class="project-desc">
+                      Giám sát và điều khiển tưới tiêu tự động đa vùng qua AWS
+                      IoT Core.
+                    </p>
+                    <div class="btn-enter">
+                      Khám phá <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <!-- Project 2: AI Vision -->
+              <div class="swiper-slide">
+                <a
+                  href="/esp-ai/"
+                  style="text-decoration: none; color: inherit"
+                >
+                  <div class="project-img-box">
+                    <div class="status-tag" style="background: #e94560">
+                      AI Vision
+                    </div>
+                    <img
+                      src="{% static 'anh2.png' %}"
+                      class="project-img"
+                      alt="AI"
+                    />
+                  </div>
+                  <div class="project-info">
+                    <h3 class="project-title">AI Vision Guard</h3>
+                    <p class="project-desc">
+                      Nhận diện khuôn mặt và cảnh báo an ninh thời gian thực
+                      trên biên.
+                    </p>
+                    <div class="btn-enter">
+                      Xem Camera <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <!-- Project 3: THAY THẾ THÀNH CNC PCB -->
+              <div class="swiper-slide">
+                <a
+                  href="{% url 'cnc_app' %}"
+                  style="text-decoration: none; color: inherit"
+                >
+                  <div class="project-img-box">
+                    <div class="status-tag" style="background: var(--accent)">
+                      CNC PCB
+                    </div>
+                    <img
+                      src="https://th.bing.com/th/id/OIP.-beoQU_BMaaymXnukRbTDgHaDw?w=307&h=177&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+                      class="project-img"
+                      alt="CNC PCB"
+                    />
+                  </div>
+                  <div class="project-info">
+                    <h3 class="project-title">CNC PCB Plotter</h3>
+                    <p class="project-desc">
+                      Giải mã hình ảnh PCB, truyền dữ liệu tọa độ qua Cloud tới
+                      STM32 để vẽ mạch tự động.
+                    </p>
+                    <div class="btn-enter">
+                      Bắt đầu vẽ <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <!-- Project 4: Future -->
+              <div class="swiper-slide">
+                <div class="project-img-box">
+                  <div class="status-tag" style="background: #555">
+                    Upcoming
+                  </div>
+                  <img
+                    src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800"
+                    class="project-img"
+                    alt="Future"
+                  />
+                </div>
+                <div class="project-info">
+                  <h3 class="project-title">Smart Home Hub</h3>
+                  <p class="project-desc">
+                    Hệ sinh thái nhà thông minh quản lý tập trung, điều khiển
+                    bằng giọng nói.
+                  </p>
+                  <div class="btn-enter" style="color: #555">
+                    In Dev <i class="fas fa-clock"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+
+          <!-- Chi Tiết Giải Pháp -->
+          <div class="project-details">
+            <div
+              class="section-title"
+              style="margin-top: 50px; margin-bottom: 80px"
+            >
+              Chi Tiết Giải Pháp
+            </div>
+
+            <!-- Details Garden -->
+            <div class="detail-row reveal">
+              <div class="detail-content">
+                <div class="detail-tag">NÔNG NGHIỆP THÔNG MINH</div>
+                <h2 class="detail-title">Smart Garden IoT</h2>
+                <p class="detail-paragraph">
+                  Giải pháp Smart Garden IoT ứng dụng nền tảng AWS IoT Core và
+                  vi điều khiển ESP32 để hiện đại hóa quy trình canh tác. Hệ
+                  thống tự động thu thập dữ liệu về độ ẩm đất, nhiệt độ và lượng
+                  mưa theo thời gian thực.
+                </p>
+                <div class="tech-stack">
+                  <span class="tech-badge">ESP32</span>
+                  <span class="tech-badge">AWS IoT Core</span>
+                  <span class="tech-badge">Django</span>
+                </div>
+              </div>
+              <div class="detail-image">
+                <div class="glow-bg"></div>
+                <div class="detail-img-frame">
+                  <img src="{% static 'anh1.jpg' %}" alt="Garden" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Details AI -->
+            <div class="detail-row reverse reveal">
+              <div class="detail-content">
+                <div class="detail-tag" style="color: #e94560">AN NINH AI</div>
+                <h2 class="detail-title">AI Vision Guard</h2>
+                <p class="detail-paragraph">
+                  Hệ thống an ninh thế hệ mới tích hợp trí tuệ nhân tạo ngay tại
+                  biên (Edge AI). Sử dụng module ESP32-CAM để nhận diện khuôn
+                  mặt và phát hiện hành vi xâm nhập với độ chính xác cao.
+                </p>
+                <div class="tech-stack">
+                  <span class="tech-badge">TensorFlow</span>
+                  <span class="tech-badge">ESP32-CAM</span>
+                  <span class="tech-badge">OpenCV</span>
+                </div>
+              </div>
+              <div class="detail-image">
+                <div class="glow-bg" style="background: #e94560"></div>
+                <div class="detail-img-frame">
+                  <img src="{% static 'anh2.png' %}" alt="AI" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Details CNC (ĐÃ CẬP NHẬT) -->
+            <div class="detail-row reveal">
+              <div class="detail-content">
+                <div class="detail-tag" style="color: var(--accent)">
+                  CÔNG NGHỆ CHẾ TẠO
+                </div>
+                <h2 class="detail-title">CNC PCB Plotter</h2>
+                <p class="detail-paragraph">
+                  Giải pháp gia công mạch in từ xa đột phá, kết hợp xử lý ảnh
+                  Cloud và điều khiển chính xác bằng STM32. Người dùng tải lên
+                  ảnh thiết kế PCB, hệ thống tự động giải mã thành tọa độ G-Code
+                  và truyền tải qua AWS IoT tới máy vẽ tại hiện trường, giúp rút
+                  ngắn thời gian tạo mẫu mạch in.
+                </p>
+                <div class="tech-stack">
+                  <span class="tech-badge">STM32</span>
+                  <span class="tech-badge">AWS IoT Core</span>
+                  <span class="tech-badge">G-Code Processing</span>
+                </div>
+              </div>
+              <div class="detail-image">
+                <div class="glow-bg" style="background: var(--accent)"></div>
+                <div class="detail-img-frame">
+                  <img
+                    src="https://th.bing.com/th/id/OIP.-beoQU_BMaaymXnukRbTDgHaDw?w=307&h=177&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+                    alt="CNC PCB"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="portal-footer" id="contact-footer">
+          <div class="footer-socials">
+            <a
+              href="https://www.facebook.com/share/1A5NH56bZT/"
+              target="_blank"
+              class="social-link"
+              title="Facebook"
+              ><i class="fab fa-facebook"></i
+            ></a>
+            <a
+              href="https://www.instagram.com/chocomeow.29/"
+              target="_blank"
+              class="social-link"
+              title="Instagram"
+              ><i class="fab fa-instagram"></i
+            ></a>
+            <a
+              href="mailto:anhnhat.coder@gmail.com?subject=Liên hệ IoT System"
+              class="social-link"
+              title="Gửi Email"
+              ><i class="fas fa-envelope"></i
+            ></a>
+          </div>
+          <p class="footer-copy">
+            &copy; 2025 ANHNHAT IOT CLOUD. ALL RIGHTS RESERVED.
+          </p>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      const mobileTrigger = document.getElementById("mobileTrigger");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+      const mainContent = document.getElementById("mainContent");
+      const contactSidebarLink = document.getElementById("contactSidebarLink");
+
+      function toggleSidebar() {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.toggle("mobile-open");
+          overlay.classList.toggle("active");
+        } else {
+          sidebar.classList.toggle("collapsed");
+        }
+      }
+
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      mobileTrigger.addEventListener("click", toggleSidebar);
+      overlay.addEventListener("click", toggleSidebar);
+
+      contactSidebarLink.addEventListener("click", () => {
+        const footer = document.getElementById("contact-footer");
+        mainContent.scrollTo({ top: footer.offsetTop, behavior: "smooth" });
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove("mobile-open");
+          overlay.classList.remove("active");
+        }
+      });
+
+      mainContent.addEventListener("scroll", () => {
+        const reveals = document.querySelectorAll(".reveal");
+        reveals.forEach((el) => {
+          let top = el.getBoundingClientRect().top;
+          if (top < window.innerHeight - 100) el.classList.add("visible");
+        });
+      });
+
+      new Swiper(".projectSwiper", {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: true,
+        pagination: { el: ".swiper-pagination", clickable: true },
+        navigation: { nextEl: "#nextBtn", prevEl: "#prevBtn" },
+        breakpoints: { 768: { slidesPerView: 2 }, 1200: { slidesPerView: 3 } },
+      });
+
+      const images = [
+        "{% static 'myportal/img/hero1.jpg' %}",
+        "{% static 'myportal/img/hero2.jpg' %}",
+        "{% static 'myportal/img/hero3.jpg' %}",
+      ];
+      let imgIdx = 0;
+      function slideBg() {
+        const hero = document.getElementById("hero");
+        if (hero) {
+          hero.style.backgroundImage = `url('${images[imgIdx]}')`;
+          imgIdx = (imgIdx + 1) % images.length;
+        }
+      }
+      slideBg();
+      setInterval(slideBg, 8000);
+    </script>
+  </body>
+</html>

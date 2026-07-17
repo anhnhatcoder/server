@@ -1,0 +1,867 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard - {{ node.name }} | AnhNhat IoT</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+      rel="shortcut icon"
+      href="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+    />
+    <!-- Thư viện đồ thị -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Google Font & Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #00d4ff;
+        --accent: #ff9f1c;
+        --bg: #050505;
+        --card-bg: #111111;
+        --text: #ffffff;
+        --border: rgba(255, 255, 255, 0.08);
+        --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 30px 40px;
+      }
+
+      /* --- 1. Header --- */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .btn-back {
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: #888;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .btn-back:hover {
+        background: var(--primary);
+        color: #000;
+        border-color: var(--primary);
+        transform: translateX(-5px);
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        background: linear-gradient(to right, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .online-status {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--primary);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--primary);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* --- 2. Grid Layout --- */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        padding: 24px;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: var(--transition);
+      }
+
+      .card:hover {
+        border-color: rgba(0, 212, 255, 0.2);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      }
+
+      .col-span-2 {
+        grid-column: span 2;
+      }
+
+      .card-tag {
+        font-size: 10px;
+        font-weight: 800;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* --- 3. KPI & Chart --- */
+      .kpi-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .kpi-item .label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #888;
+        margin-bottom: 5px;
+      }
+
+      .kpi-item .value {
+        font-size: 32px;
+        font-weight: 800;
+      }
+
+      canvas {
+        width: 100% !important;
+        height: 250px !important;
+      }
+
+      /* --- 4. MQTT & Weather --- */
+      .mqtt-box {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px dashed rgba(0, 212, 255, 0.2);
+        margin-bottom: 20px;
+      }
+
+      .mqtt-topic {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: #a5b4fc;
+        display: block;
+        margin-bottom: 6px;
+        word-break: break-all;
+      }
+
+      .mqtt-tag {
+        color: var(--primary);
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      .weather-wrapper {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .weather-emoji {
+        font-size: 70px;
+        margin: 10px 0;
+        filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.3));
+      }
+
+      /* --- 5. Pump Controls --- */
+      #pumpContainer {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+
+      .pump-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 12px 16px;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border);
+        transition: 0.3s;
+      }
+
+      .pump-row:hover {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .pump-name {
+        font-weight: 700;
+        font-size: 13px;
+        color: #ccc;
+        text-transform: uppercase;
+      }
+
+      .pump-status {
+        font-weight: 800;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        min-width: 45px;
+        text-align: center;
+        margin-right: 10px;
+      }
+
+      .status-on {
+        color: var(--primary);
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+      }
+      .status-off {
+        color: #ff6b6b;
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.2);
+      }
+
+      .btn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 0;
+        font-weight: 800;
+        font-size: 11px;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .btn-on {
+        background: var(--primary);
+        color: #000;
+        margin-right: 5px;
+      }
+      .btn-off {
+        background: #333;
+        color: #fff;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+      }
+
+      .btn-del {
+        background: none;
+        border: 1px solid rgba(255, 107, 107, 0.2);
+        color: #ff6b6b;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 10px;
+        margin-left: 10px;
+      }
+      .btn-del:hover {
+        background: #ff6b6b;
+        color: white;
+      }
+
+      .btn-add {
+        width: 100%;
+        background: rgba(0, 212, 255, 0.05);
+        color: var(--primary);
+        border: 1px dashed var(--primary);
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: 0.3s;
+      }
+      .btn-add:hover {
+        background: var(--primary);
+        color: #000;
+      }
+
+      /* --- 6. Components --- */
+      .component-list {
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+
+      .comp-item {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 12px;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid transparent;
+        transition: 0.3s;
+      }
+
+      .comp-item:hover {
+        border-color: var(--border);
+        transform: translateX(5px);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .comp-item img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        margin-right: 15px;
+      }
+
+      .comp-info h4 {
+        font-size: 13px;
+        color: var(--primary);
+        margin-bottom: 2px;
+      }
+      .comp-info p {
+        font-size: 11px;
+        color: #666;
+      }
+
+      /* Footer */
+      footer {
+        margin-top: 40px;
+        text-align: center;
+        color: #444;
+        font-size: 12px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+      }
+
+      @media (max-width: 1100px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .col-span-2 {
+          grid-column: span 2;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .col-span-2 {
+          grid-column: auto;
+        }
+      }
+
+      /* Scrollbar Custom */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #222;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-left">
+          <a href="{% url 'home' %}" class="btn-back">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+          <div>
+            <h1>{{ node.name }}</h1>
+            <div
+              style="
+                font-size: 11px;
+                color: #555;
+                margin-top: 4px;
+                font-weight: 600;
+              "
+            >
+              ID: <span style="color: #888">{{ node.node_id }}</span> | 📍 {{
+              node.location }}
+            </div>
+          </div>
+        </div>
+        <div class="online-status">
+          <div class="status-dot"></div>
+          Online Monitoring
+        </div>
+      </header>
+
+      <div class="grid">
+        <!-- 1. CHART & REALTIME KPI -->
+        <div class="card col-span-2">
+          <div class="card-tag">
+            <i class="fas fa-chart-line"></i> Phân tích môi trường
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-item">
+              <div class="label">NHIỆT ĐỘ</div>
+              <div id="tempVal" class="value" style="color: #ff8a65">-- °C</div>
+            </div>
+            <div class="kpi-item" style="text-align: right">
+              <div class="label">ĐỘ ẨM</div>
+              <div id="humVal" class="value" style="color: var(--primary)">
+                -- %
+              </div>
+            </div>
+          </div>
+          <div style="flex-grow: 1">
+            <canvas id="tempHumChart"></canvas>
+          </div>
+        </div>
+
+        <!-- 2. MQTT & WEATHER -->
+        <div class="card">
+          <div class="card-tag">
+            <i class="fas fa-satellite-dish"></i> Hệ thống & Thời tiết
+          </div>
+          <div class="mqtt-box">
+            <span class="mqtt-topic"
+              ><span class="mqtt-tag">PUB:</span
+              >esp32/{{node.node_id}}/data</span
+            >
+            <span class="mqtt-topic"
+              ><span class="mqtt-tag">SUB:</span
+              >esp32/{{node.node_id}}/control</span
+            >
+          </div>
+          <div class="weather-wrapper">
+            <div
+              class="label"
+              style="
+                font-size: 12px;
+                color: #555;
+                font-weight: 800;
+                text-transform: uppercase;
+              "
+            >
+              Dự báo hiện tại
+            </div>
+            <div id="weatherIcon" class="weather-emoji">☀️</div>
+            <div
+              id="rainText"
+              style="font-size: 18px; font-weight: 800; color: #ffd700"
+            >
+              Nắng đẹp
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. PLANT INFO & SOIL -->
+        <div class="card">
+          <div class="card-tag">
+            <i class="fas fa-seedling"></i> Trạng thái cây trồng
+          </div>
+          <div style="text-align: center; margin-bottom: 25px">
+            <div style="font-size: 45px; margin-bottom: 10px">🌱</div>
+            <h2 style="font-size: 22px; font-weight: 800">{{ node.name }}</h2>
+            <div
+              id="plantStatus"
+              style="
+                margin-top: 8px;
+                display: inline-block;
+                padding: 5px 12px;
+                border-radius: 50px;
+                font-size: 11px;
+                font-weight: 800;
+                background: rgba(0, 212, 255, 0.1);
+                color: var(--primary);
+                text-transform: uppercase;
+              "
+            >
+              Sức khỏe: Tốt
+            </div>
+          </div>
+          <div
+            style="
+              background: rgba(0, 0, 0, 0.3);
+              padding: 20px;
+              border-radius: 20px;
+              text-align: center;
+              border: 1px solid var(--border);
+            "
+          >
+            <div
+              class="label"
+              style="
+                font-size: 11px;
+                color: #555;
+                font-weight: 800;
+                margin-bottom: 5px;
+              "
+            >
+              ĐỘ ẨM ĐẤT
+            </div>
+            <div
+              id="soilMoist"
+              class="value"
+              style="font-size: 40px; font-weight: 800"
+            >
+              -- %
+            </div>
+            <div
+              id="soilText"
+              style="
+                font-size: 12px;
+                color: #444;
+                margin-top: 5px;
+                font-weight: 700;
+              "
+            >
+              (Đang lấy dữ liệu...)
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. PUMP CONTROL -->
+        <div class="card">
+          <div class="card-tag">
+            <i class="fas fa-toggle-on"></i> Điều khiển thiết bị
+          </div>
+          <div id="pumpContainer">
+            <!-- Render via JS -->
+          </div>
+          <button onclick="addNewPump()" class="btn-add">
+            <i class="fas fa-plus"></i> THÊM THIẾT BỊ
+          </button>
+        </div>
+
+        <!-- 5. HARDWARE LIST -->
+        <div class="card">
+          <div class="card-tag">
+            <i class="fas fa-microchip"></i> Thành phần phần cứng
+          </div>
+          <div class="component-list">
+            <div class="comp-item">
+              <img
+                src="https://tse4.mm.bing.net/th/id/OIP.JBUM0ML-U84unz_9DHg5jAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+              />
+              <div class="comp-info">
+                <h4>ESP32-C3</h4>
+                <p>Vi điều khiển chính.</p>
+              </div>
+            </div>
+            <div class="comp-item">
+              <img
+                src="https://th.bing.com/th/id/OIP.3jTKUxloErBjfy6MxfgCogHaHa?w=193&h=193&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+              />
+              <div class="comp-info">
+                <h4>DHT11</h4>
+                <p>Cảm biến Nhiệt/Ẩm.</p>
+              </div>
+            </div>
+            <div class="comp-item">
+              <img
+                src="https://th.bing.com/th/id/OIP.Sbr1ZJUVghJsSiJ4oJrueAHaHa?w=156&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+              />
+              <div class="comp-info">
+                <h4>Capacitive Soil</h4>
+                <p>Đo độ ẩm đất.</p>
+              </div>
+            </div>
+            <div class="comp-item">
+              <img
+                src="https://th.bing.com/th/id/OIP.qKqZIWQPuEIxbLFoC64kXAHaHa?w=176&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+              />
+              <div class="comp-info">
+                <h4>Relay 5V</h4>
+                <p>Kích hoạt máy bơm.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        Smart Garden IoT Dashboard v2.0 | Secure Edge Computing | Cập nhật:
+        <span id="lastUpdate">--</span>
+      </footer>
+    </div>
+
+    <script>
+      const currentNodeId = "{{ node.node_id }}";
+
+      // 1. Quản lý thiết bị (LocalStorage)
+      let pumps = JSON.parse(
+        localStorage.getItem("pumps_" + currentNodeId)
+      ) || ["pump1"];
+      if (!pumps.includes("pump1")) pumps.unshift("pump1");
+
+      function savePumps() {
+        localStorage.setItem("pumps_" + currentNodeId, JSON.stringify(pumps));
+        renderPumps();
+      }
+
+      function renderPumps() {
+        const container = document.getElementById("pumpContainer");
+        container.innerHTML = "";
+        pumps.forEach((pid) => {
+          const deleteBtn =
+            pid !== "pump1"
+              ? `<button onclick="deletePump('${pid}')" class="btn-del">✕</button>`
+              : "";
+          const html = `
+            <div class="pump-row">
+              <div style="display:flex; align-items:center; gap: 10px;">
+                <span class="pump-name">${pid.toUpperCase()}</span>
+                ${deleteBtn}
+              </div>
+              <div style="display:flex; align-items:center;">
+                <span id="${pid}State" class="pump-status status-off">OFF</span>
+                <button onclick="controlDevice('${pid}','ON')" class="btn btn-on">ON</button>
+                <button onclick="controlDevice('${pid}','OFF')" class="btn btn-off">OFF</button>
+              </div>
+            </div>`;
+          container.insertAdjacentHTML("beforeend", html);
+        });
+      }
+
+      function addNewPump() {
+        const newId = prompt("Nhập mã thiết bị (vd: den_san, quat...):");
+        if (newId) {
+          const cleanId = newId.toLowerCase().replace(/[^a-z0-9]/g, "");
+          if (cleanId && !pumps.includes(cleanId)) {
+            pumps.push(cleanId);
+            savePumps();
+          }
+        }
+      }
+
+      function deletePump(pid) {
+        if (confirm(`Xóa thiết bị ${pid}?`)) {
+          pumps = pumps.filter((p) => p !== pid);
+          savePumps();
+        }
+      }
+
+      renderPumps();
+
+      // 2. Biểu đồ Gradient
+      const ctx = document.getElementById("tempHumChart").getContext("2d");
+      let gT = ctx.createLinearGradient(0, 0, 0, 300);
+      gT.addColorStop(0, "rgba(255, 138, 101, 0.4)");
+      gT.addColorStop(1, "rgba(255, 138, 101, 0)");
+      let gH = ctx.createLinearGradient(0, 0, 0, 300);
+      gH.addColorStop(0, "rgba(0, 212, 255, 0.4)");
+      gH.addColorStop(1, "rgba(0, 212, 255, 0)");
+
+      const timeLabels = [],
+        tempData = [],
+        humData = [];
+      const chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: timeLabels,
+          datasets: [
+            {
+              label: "Nhiệt độ",
+              data: tempData,
+              borderColor: "#ff8a65",
+              backgroundColor: gT,
+              fill: true,
+              tension: 0.4,
+              yAxisID: "y",
+            },
+            {
+              label: "Độ ẩm",
+              data: humData,
+              borderColor: "#00d4ff",
+              backgroundColor: gH,
+              fill: true,
+              tension: 0.4,
+              yAxisID: "y1",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          scales: {
+            y: {
+              position: "left",
+              min: 0,
+              max: 50,
+              grid: { color: "rgba(255,255,255,0.05)" },
+            },
+            y1: {
+              position: "right",
+              min: 0,
+              max: 100,
+              grid: { display: false },
+            },
+            x: { display: false },
+          },
+          plugins: {
+            legend: { labels: { color: "#555", font: { weight: "800" } } },
+          },
+        },
+      });
+
+      function addDataPoint(t, temp, hum) {
+        if (timeLabels.length > 20) {
+          timeLabels.shift();
+          tempData.shift();
+          humData.shift();
+        }
+        timeLabels.push(t);
+        tempData.push(temp);
+        humData.push(hum);
+        chart.update();
+      }
+
+      // 3. API Polling
+      function updateDashboard() {
+        fetch(`/api/data/${currentNodeId}/`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.danh_sach || data.danh_sach.length === 0) return;
+            const now = new Date().toLocaleTimeString("vi-VN");
+            document.getElementById("lastUpdate").textContent = now;
+            let lT = null,
+              lH = null,
+              lR = null,
+              lS = null;
+
+            data.danh_sach.forEach((item) => {
+              const k = item.ten;
+              const v = item.gia_tri;
+              if (k === "temperature" && lT === null) lT = v;
+              if (k === "humidity" && lH === null) lH = v;
+              if (k === "rainDigital" && lR === null) lR = v;
+              if (k === "soilPercent" && lS === null) lS = v;
+
+              pumps.forEach((pid) => {
+                if (k === pid + "State") {
+                  const el = document.getElementById(pid + "State");
+                  if (el) {
+                    el.innerText = v === 1 ? "ON" : "OFF";
+                    el.className =
+                      v === 1
+                        ? "pump-status status-on"
+                        : "pump-status status-off";
+                  }
+                }
+              });
+            });
+
+            if (lT !== null) {
+              document.getElementById("tempVal").innerText = lT + " °C";
+              addDataPoint(now, lT, lH);
+            }
+            if (lH !== null)
+              document.getElementById("humVal").innerText = lH + " %";
+
+            if (lS !== null) {
+              document.getElementById("soilMoist").innerText = lS + " %";
+              document.getElementById("soilText").innerText =
+                lS < 40 ? "ĐẤT KHÔ (CẦN TƯỚI)" : "ĐẤT ĐỦ ẨM";
+              document.getElementById("soilText").style.color =
+                lS < 40 ? "#ff9f1c" : "#00d4ff";
+            }
+
+            const icon = document.getElementById("weatherIcon");
+            const txt = document.getElementById("rainText");
+            if (lR !== null && lR === 0) {
+              icon.innerText = "🌧️";
+              txt.innerText = "Đang mưa";
+              txt.style.color = "#00d4ff";
+            } else {
+              icon.innerText = "☀️";
+              txt.innerText = "Nắng đẹp";
+              txt.style.color = "#ffd700";
+            }
+          });
+      }
+
+      function controlDevice(deviceId, state) {
+        const el = document.getElementById(deviceId + "State");
+        if (el) el.innerText = "...";
+        fetch(`/api/control/${currentNodeId}/${deviceId}/${state}/`)
+          .then((res) => res.json())
+          .then((d) => {
+            if (d.status === "success") {
+              if (el) {
+                el.innerText = state;
+                el.className =
+                  state === "ON"
+                    ? "pump-status status-on"
+                    : "pump-status status-off";
+              }
+            }
+          });
+      }
+
+      setInterval(updateDashboard, 2000);
+      updateDashboard();
+    </script>
+  </body>
+</html>

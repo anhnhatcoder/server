@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cập nhật Firmware</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="shotcut icon"
+      href="https://gtsolution.vn/wp-content/uploads/bachkhoa.png"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: #0f1724;
+        color: #e6eef6;
+        font-family: "Inter", sans-serif;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 30px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      h1 {
+        color: #42a5f5;
+        text-align: center;
+      }
+      label {
+        display: block;
+        margin: 15px 0 5px;
+        color: #9aa4b2;
+      }
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        background: #162032;
+        border: 1px solid #334155;
+        color: white;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+      input[type="file"] {
+        margin-top: 5px;
+      }
+      button {
+        background: linear-gradient(90deg, #42a5f5, #2196f3);
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        width: 100%;
+        font-weight: bold;
+        margin-top: 20px;
+        cursor: pointer;
+      }
+      .back-btn {
+        color: #9aa4b2;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+      }
+      .back-btn:hover {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- ĐÃ SỬA DÒNG NÀY: Trỏ về 'home' -->
+      <a href="{% url 'home' %}" class="back-btn">← Quay lại Trang Chủ</a>
+
+      <div class="card" style="margin-top: 20px">
+        <h1>⚙️ OTA Firmware</h1>
+
+        <div
+          style="
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+          "
+        >
+          <h4 style="margin: 0 0 10px 0; color: #7be495">
+            Phiên bản mới nhất trên Server:
+          </h4>
+          {% if latest_fw %}
+          <div style="font-size: 24px; font-weight: bold">
+            v{{ latest_fw.version }}
+          </div>
+          <div style="font-size: 12px; color: #aaa">
+            Update: {{ latest_fw.uploaded_at|date:"H:i d/m/Y" }}
+          </div>
+          {% else %}
+          <div>Chưa có bản nào.</div>
+          {% endif %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label>Phiên bản (VD: 1.0.2):</label>
+          {{ form.version }}
+          <label>File Binary (.bin):</label>
+          {{ form.file_bin }}
+          <label>Ghi chú:</label>
+          {{ form.description }}
+          <button type="submit">UPLOAD</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
