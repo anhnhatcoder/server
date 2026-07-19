@@ -20,7 +20,7 @@ Hoặc điền nội dung chứng chỉ vào các biến tương ứng trong mã
 Bước 3: Khởi chạy hệ thống bằng Docker
 Build và chạy các container ngầm (bao gồm web server và các service đi kèm):
 ```bash
-cd ten-kho-chua-cua-ban/server
+cd server
 sudo docker compose up -d --build
 ```
 Bước 4: Cấp quyền cho Cơ sở dữ liệu (Đặc biệt quan trọng trên Linux)
