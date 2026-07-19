@@ -7,7 +7,7 @@ Các bước cài đặt (Installation)
 Bước 1: Tải mã nguồn về máy
 
 Bash
-git clone https://github.com/anhnhatcoder/ten-kho-chua-cua-ban.git
+git clone https://github.com/anhnhatcoder/server.git
 cd ten-kho-chua-cua-ban
 Bước 2: Cấu hình chứng chỉ AWS IoT
 Người dùng cần tạo chứng chỉ trên AWS IoT Core của riêng họ và đặt vào hệ thống:
@@ -18,9 +18,10 @@ Hoặc điền nội dung chứng chỉ vào các biến tương ứng trong mã
 
 Bước 3: Khởi chạy hệ thống bằng Docker
 Build và chạy các container ngầm (bao gồm web server và các service đi kèm):
-
+'''c
 Bash
 sudo docker compose up -d --build
+'''
 Bước 4: Cấp quyền cho Cơ sở dữ liệu (Đặc biệt quan trọng trên Linux)
 Để tránh lỗi readonly khi ghi dữ liệu vào SQLite, người dùng cần cấp quyền cho file database:
 
