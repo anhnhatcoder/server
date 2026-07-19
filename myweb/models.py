@@ -28,3 +28,21 @@ class Firmware(models.Model):
     file_bin = models.FileField(upload_to='firmware/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True)
+
+# 4. Bảng Phòng (Dành cho Smart Home)
+class Room(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    icon = models.CharField(max_length=50, default='fa-solid fa-house')
+
+    def __str__(self):
+        return self.name
+
+# 5. Bảng Thiết bị (Dành cho Smart Home)
+class Device(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='devices')
+    name = models.CharField(max_length=50)        # VD: Đèn phòng khách
+    device_key = models.CharField(max_length=50)  # VD: relay_1, light_1
+    status = models.BooleanField(default=False)   # True: Bật, False: Tắt
+
+    def __str__(self):
+        return f"{self.name} - {self.room.name}"

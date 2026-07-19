@@ -10,3 +10,4 @@ AWSIoTPythonSDK
 requests
 pillow
 whitenoise
+paho-mqtt

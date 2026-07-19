@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartHome Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      body {
+        background-color: #0b0b0b;
+        color: #ffffff;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .text-cyan {
+        color: #00d2ff !important;
+      }
+      .bg-cyan {
+        background-color: #00d2ff !important;
+        color: #000 !important;
+      }
+      .card-custom {
+        background-color: #141414;
+        border: 1px solid #222;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      }
+      .input-custom {
+        background-color: #050505;
+        border: 1px solid #333;
+        color: #fff;
+        border-radius: 8px;
+      }
+      .input-custom:focus {
+        background-color: #111;
+        border-color: #00d2ff;
+        color: #fff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 210, 255, 0.25);
+      }
+      .btn-cyan {
+        background-color: #00d2ff;
+        color: #000;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        transition: 0.3s;
+      }
+      .btn-cyan:hover {
+        background-color: #00b8e6;
+        color: #000;
+      }
+      .nav-btn {
+        background-color: transparent;
+        border: 1px solid #333;
+        color: #aaa;
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.9rem;
+        transition: 0.3s;
+        text-decoration: none;
+      }
+      .nav-btn:hover {
+        border-color: #00d2ff;
+        color: #00d2ff;
+      }
+      .sensor-box {
+        background-color: #0a0a0a;
+        border: 1px solid #222;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+      }
+      .device-item {
+        border-bottom: 1px solid #222;
+        padding: 12px 0;
+      }
+      .device-item:last-child {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-5">
+      <!-- ================= HEADER ================= -->
+      <div
+        class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary pb-3"
+      >
+        <h2 class="text-uppercase fw-bold text-cyan mb-0">
+          HỆ THỐNG SMART HOME
+        </h2>
+        <div class="d-flex gap-2">
+          <a href="{% url 'portal_home' %}" class="nav-btn"
+            ><i class="fa-solid fa-house"></i> HOME</a
+          >
+          <form action="{% url 'logout' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="nav-btn">
+              <i class="fa-solid fa-right-from-bracket"></i> ĐĂNG XUẤT
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ================= FORM THÊM PHÒNG ================= -->
+      <div class="card-custom p-4 mb-5">
+        <h5 class="text-cyan fw-bold mb-4">
+          <i class="fa-solid fa-circle-plus"></i> Đăng ký Phòng mới
+        </h5>
+        <form action="{% url 'add_room' %}" method="POST">
+          {% csrf_token %}
+          <div class="row g-3 mb-4">
+            <div class="col-md-12">
+              <label class="form-label small text-uppercase"
+                >Tên phòng hiển thị</label
+              >
+              <input
+                type="text"
+                class="form-control input-custom"
+                name="room_name"
+                placeholder="VD: Phòng Khách, Tầng 1..."
+                required
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-cyan w-100 py-2">
+            TẠO PHÒNG VÀO HỆ THỐNG
+          </button>
+        </form>
+      </div>
+
+      <!-- ================= DANH SÁCH CÁC PHÒNG ĐÃ TẠO ================= -->
+      <div class="row">
+        {% for room in rooms %}
+        <div class="col-lg-6 mb-4">
+          <div class="card-custom p-4 h-100">
+            <!-- Tên phòng & Xoá phòng -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <!-- prettier-ignore -->
+              <h4 class="fw-bold mb-0"><i class="fa-solid fa-house-chimney text-cyan me-2"></i>{{ room.name }}</h4>
+              <form
+                action="{% url 'delete_room' room.id %}"
+                method="POST"
+                onsubmit="
+                  return confirm(
+                    'Bạn có chắc chắn muốn xoá phòng này? Toàn bộ thiết bị bên trong sẽ bị xoá!',
+                  );
+                "
+              >
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="fa-solid fa-trash"></i> Xoá
+                </button>
+              </form>
+            </div>
+
+            <!-- Bảng hiển thị Nhiệt độ / Độ ẩm -->
+            <div class="row g-2 mb-4">
+              <div class="col-6">
+                <div class="sensor-box">
+                  <i
+                    class="fa-solid fa-temperature-half text-danger mb-2 fs-4"
+                  ></i>
+                  <h6 class="text-muted small mb-1">Nhiệt độ</h6>
+                  <h4 class="mb-0 fw-bold">26.5 °C</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="sensor-box">
+                  <i class="fa-solid fa-droplet text-info mb-2 fs-4"></i>
+                  <h6 class="text-muted small mb-1">Độ ẩm</h6>
+                  <h4 class="mb-0 fw-bold">60 %</h4>
+                </div>
+              </div>
+            </div>
+
+            <!-- Danh sách Thiết bị -->
+            <h6
+              class="text-uppercase small fw-bold mb-3 border-bottom border-secondary pb-2"
+            >
+              Thiết bị điện & Dòng điện
+            </h6>
+            <div class="mb-4">
+              {% for device in room.devices.all %}
+              <div
+                class="device-item d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <!-- prettier-ignore -->
+                  <h6 class="mb-1"><i class="fa-solid fa-plug text-warning me-2"></i>{{ device.name }}</h6>
+                  <!-- prettier-ignore -->
+                  <small >Tiêu thụ: <span class="text-cyan fw-bold">1.2 A</span> | ID: {{ device.device_key }}</small>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="form-check form-switch fs-5">
+                    <!-- prettier-ignore -->
+                    <input class="form-check-input" type="checkbox" role="switch" {% if device.status %}checked{% endif %} disabled />
+                  </div>
+                  <form
+                    action="{% url 'delete_device' device.id %}"
+                    method="POST"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="submit"
+                      class="btn text-danger p-0"
+                      title="Xoá thiết bị"
+                    >
+                      <i class="fa-solid fa-circle-xmark fs-5"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+              {% empty %}
+              <p class="text-muted small text-center py-3 fst-italic">
+                Chưa có thiết bị nào. Hãy thêm ở dưới.
+              </p>
+              {% endfor %}
+            </div>
+
+            <!-- Form Thêm thiết bị -->
+            <form
+              action="{% url 'add_device' room.id %}"
+              method="POST"
+              class="mt-auto"
+            >
+              {% csrf_token %}
+              <div class="input-group">
+                <input
+                  type="text"
+                  name="device_name"
+                  class="form-control input-custom form-control-sm"
+                  placeholder="Tên: Đèn trần"
+                  required
+                />
+                <input
+                  type="text"
+                  name="device_key"
+                  class="form-control input-custom form-control-sm"
+                  placeholder="Mã: light_1"
+                  required
+                />
+                <button class="btn btn-cyan btn-sm px-3" type="submit">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+          <i
+            class="fa-solid fa-box-open text-muted mb-3"
+            style="font-size: 4rem; opacity: 0.3"
+          ></i>
+          <p class="text-muted">Chưa có phòng nào được đăng ký.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
