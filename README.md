@@ -10,6 +10,10 @@ Nếu máy bạn chưa có Docker, hãy làm theo hướng dẫn sau tùy thuộ
 *👉 Dành cho Windows / macOS:*
 1. Tải và cài đặt **Docker Desktop** từ trang chủ chính thức: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
 2. Chạy ứng dụng Docker Desktop (trên Windows, hãy đảm bảo tính năng WSL2 đã được bật theo hướng dẫn của trình cài đặt).
+3. Chờ Docker khởi động
+Quá trình khởi động có thể mất từ 1-2 phút (đặc biệt là nếu dùng WSL2). Bạn hãy để ý góc dưới bên trái của cửa sổ Docker Desktop:
+Nó sẽ hiện màu cam hoặc chữ Starting...
+Khi nào nó chuyển sang màu xanh lá cây và báo Engine running, nghĩa là Docker đã sẵn sàng.
 
 *👉 Dành cho Linux (Ubuntu / Debian / Raspberry Pi OS):*
 Mở Terminal và chạy lần lượt các lệnh sau để tự động cài đặt bản Docker mới nhất:
