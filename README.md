@@ -24,7 +24,7 @@ sudo sh get-docker.sh
 **Bước 1: Tải mã nguồn về máy**
 
 ```Bash
-cd ten-kho-chua-cua-ban
+cd (nơi để lưu folder của server)
 git clone https://github.com/anhnhatcoder/server.git
 ```
 **Bước 2 (có thể bỏ qua): Cấu hình chứng chỉ AWS IoT**
