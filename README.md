@@ -44,13 +44,13 @@ sudo docker compose up -d --build
 cd server
 docker compose up -d --build
 ```
-**Bước 4: Cấp quyền cho Cơ sở dữ liệu (Đặc biệt quan trọng trên Linux)**
+**Bước 4 (có thể bỏ qua): Cấp quyền cho Cơ sở dữ liệu (Đặc biệt quan trọng trên Linux)**
 Để tránh lỗi readonly khi ghi dữ liệu vào SQLite, người dùng cần cấp quyền cho file database:
 ```bash
 //linux
 sudo chmod 666 db.sqlite3
 ```
-**Bước 5: Khởi tạo Database và Tạo tài khoản quản trị**
+**Bước 5 (có thể bỏ qua): Khởi tạo Database và Tạo tài khoản quản trị**
 Chạy lệnh migrate để tạo các bảng (như Room, Device, Node...) trong database:
 ```bash
 //linux
@@ -60,7 +60,7 @@ sudo docker compose exec web python manage.py migrate
 docker compose exec web python manage.py makemigrations
 docker compose exec web python manage.py migrate
 ```
-Sau đó, tạo tài khoản Admin để đăng nhập vào hệ thống:
+Sau đó (có thể bỏ qua), tạo tài khoản Admin để đăng nhập vào hệ thống:
 ```bash
 //linux
 sudo docker compose exec web python manage.py createsuperuser
