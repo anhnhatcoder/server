@@ -18,25 +18,28 @@ Hoặc điền nội dung chứng chỉ vào các biến tương ứng trong mã
 
 Bước 3: Khởi chạy hệ thống bằng Docker
 Build và chạy các container ngầm (bao gồm web server và các service đi kèm):
-'''c
+```c
 Bash
 sudo docker compose up -d --build
-'''
+```
 Bước 4: Cấp quyền cho Cơ sở dữ liệu (Đặc biệt quan trọng trên Linux)
 Để tránh lỗi readonly khi ghi dữ liệu vào SQLite, người dùng cần cấp quyền cho file database:
-
+```c
 Bash
 sudo chmod 666 db.sqlite3
+```
 Bước 5: Khởi tạo Database và Tạo tài khoản quản trị
 Chạy lệnh migrate để tạo các bảng (như Room, Device, Node...) trong database:
-
+```c
 Bash
 sudo docker compose exec web python manage.py makemigrations
 sudo docker compose exec web python manage.py migrate
+```
 Sau đó, tạo tài khoản Admin để đăng nhập vào hệ thống:
-
+```c
 Bash
 sudo docker compose exec web python manage.py createsuperuser
+```
 (Điền username, email và password theo hướng dẫn trên màn hình)
 
 Sử dụng (Usage)
