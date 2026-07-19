@@ -3,7 +3,7 @@ Hệ điều hành: Linux (Ubuntu/Debian), macOS hoặc Windows (có cài đặt
 
 Đã cài đặt Docker và Docker Compose.
 
-Các bước cài đặt (Installation)
+### Các bước cài đặt (Installation)
 Bước 1: Tải mã nguồn về máy
 
 ```Bash
