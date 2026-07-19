@@ -4,20 +4,33 @@ Hệ điều hành: Linux (Ubuntu/Debian), macOS hoặc Windows (có cài đặt
 Đã cài đặt Docker và Docker Compose.
 
 ### Các bước cài đặt (Installation)
-Bước 1: Tải mã nguồn về máy
+**Bước 0: Cài đặt Docker & Docker Compose**
+Nếu máy bạn chưa có Docker, hãy làm theo hướng dẫn sau tùy thuộc vào hệ điều hành đang sử dụng:
+
+*👉 Dành cho Windows / macOS:*
+1. Tải và cài đặt **Docker Desktop** từ trang chủ chính thức: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+2. Chạy ứng dụng Docker Desktop (trên Windows, hãy đảm bảo tính năng WSL2 đã được bật theo hướng dẫn của trình cài đặt).
+
+*👉 Dành cho Linux (Ubuntu / Debian / Raspberry Pi OS):*
+Mở Terminal và chạy lần lượt các lệnh sau để tự động cài đặt bản Docker mới nhất:
+```bash
+curl -fsSL [https://get.docker.com](https://get.docker.com) -o get-docker.sh
+sudo sh get-docker.sh
+```
+**Bước 1: Tải mã nguồn về máy**
 
 ```Bash
 cd ten-kho-chua-cua-ban
 git clone https://github.com/anhnhatcoder/server.git
 ```
-Bước 2: Cấu hình chứng chỉ AWS IoT
+**Bước 2: Cấu hình chứng chỉ AWS IoT**
 Người dùng cần tạo chứng chỉ trên AWS IoT Core của riêng họ và đặt vào hệ thống:
 
 Copy các file chứng chỉ (RootCA, Certificate, Private Key) vào thư mục certs/.
 
 Hoặc điền nội dung chứng chỉ vào các biến tương ứng trong mã nguồn (nếu có).
 
-Bước 3: Khởi chạy hệ thống bằng Docker
+**Bước 3: Khởi chạy hệ thống bằng Docker**
 Build và chạy các container ngầm (bao gồm web server và các service đi kèm):
 ```bash
 //linux
@@ -27,13 +40,13 @@ sudo docker compose up -d --build
 cd server
 docker compose up -d --build
 ```
-Bước 4: Cấp quyền cho Cơ sở dữ liệu (Đặc biệt quan trọng trên Linux)
+**Bước 4: Cấp quyền cho Cơ sở dữ liệu (Đặc biệt quan trọng trên Linux)**
 Để tránh lỗi readonly khi ghi dữ liệu vào SQLite, người dùng cần cấp quyền cho file database:
 ```bash
 //linux
 sudo chmod 666 db.sqlite3
 ```
-Bước 5: Khởi tạo Database và Tạo tài khoản quản trị
+**Bước 5: Khởi tạo Database và Tạo tài khoản quản trị**
 Chạy lệnh migrate để tạo các bảng (như Room, Device, Node...) trong database:
 ```bash
 //linux
