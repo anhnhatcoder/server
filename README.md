@@ -7,8 +7,8 @@ Hệ điều hành: Linux (Ubuntu/Debian), macOS hoặc Windows (có cài đặt
 Bước 1: Tải mã nguồn về máy
 
 ```Bash
-git clone https://github.com/anhnhatcoder/server.git
 cd ten-kho-chua-cua-ban
+git clone https://github.com/anhnhatcoder/server.git
 ```
 Bước 2: Cấu hình chứng chỉ AWS IoT
 Người dùng cần tạo chứng chỉ trên AWS IoT Core của riêng họ và đặt vào hệ thống:
