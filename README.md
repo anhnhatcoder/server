@@ -71,3 +71,9 @@ docker compose exec web python manage.py createsuperuser
 
 Sử dụng (Usage)
 Mở trình duyệt và truy cập vào địa chỉ: http://localhost:8000 (hoặc IP của máy chủ/Raspberry Pi). Đăng nhập bằng tài khoản Superuser vừa tạo để trải nghiệm các chức năng Smart Garden và Smart Home.
+
+## video test
+
+
+https://github.com/user-attachments/assets/ff4dbdc3-243e-4044-a01c-a4020ce7af26
+
